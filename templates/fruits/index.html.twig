@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fruits | Fruitsninja{% endblock %}
+
+{% block body %}
+<div class="heading text-center mt-5 mb-5">
+  <h1>Fruits</h1>
+</div>
+<div class="mb-2"> 
+  <a href="{{ path('app_favourite_fruits') }}" class="btn btn-warning">My Favourite Fruits</a>
+</div>
+<div id="alert-msg"></div>
+<table class="table" id="myTable">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Family</th>
+      <th scope="col">Order</th>
+      <th scope="col">Genus</th>
+      <th scope="col" width="15%">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if fruits %}
+      {% for fruit in fruits %}
+      <tr>
+        <td>{{ fruit.name }}</td>
+        <td>{{ fruit.family }}</td>
+        <td>{{ fruit.fruitOrder }}</td>
+        <td>{{ fruit.genus }}</td>
+        <td data-id="{{ fruit.id }}">
+          {% set displayAddFavouriteBtn = true %}
+          {% if fruit.isFavourite %}
+            {% set displayAddFavouriteBtn = false %}
+          {% endif %}
+          <button class="btn btn-sm btn-success favourite-btn add-favourite {% if displayAddFavouriteBtn == false %} d-none {% endif %}" id="add-favourite-{{ fruit.id }}" data-link="{{ path('app_add_remove_favourite', {'id': fruit.id}) }}"><i class="fa fa-add"></i>Add To Favourite</button>
+          <button class="btn btn-sm btn-danger favourite-btn remove-favourite {% if displayAddFavouriteBtn == true %} d-none {% endif %}" id="remove-favourite-{{ fruit.id }}" data-link="{{ path('app_add_remove_favourite', {'id': fruit.id}) }}"><i class="fa fa-add"></i>Remove Favourite</button>
+        </td>
+      </tr>
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block javascripts %}
+<script type="text/javascript">
+$(document).ready(function () {
+  $('#myTable').DataTable();
+
+  // Add Remove Favourite
+  $(document).on('click', ".favourite-btn", function(){
+
+    var recordId = $(this).parent().data('id');
+    var url = $(this).data('link');
+    var id = $(this).attr('id');
+    $("#"+id).prop('disabled', true);
+    $.ajax({
+      method: "GET",
+      url: url,
+      success: (result) => {
+        $(this).prop('disabled', false);
+        if (result.status == true) {
+
+          // hide show button
+          if ($(this).hasClass('add-favourite')) {
+            $(this).parent().find('.remove-favourite').removeClass('d-none');
+            $(this).addClass('d-none');
+          } else if ($(this).hasClass('remove-favourite')) {
+            $(this).parent().find('.add-favourite').removeClass('d-none');
+            $(this).addClass('d-none');
+          }
+          
+          $("#alert-msg").html('<div class="alert alert-success" role="alert">'+result.message+'</div>');
+        } else {
+          $("#alert-msg").html('<div class="alert alert-danger" role="alert">'+result.message+'</div>');
+        }
+
+        $(".alert").delay(2000).slideUp(200, function() {
+          $(this).alert('close');
+        });
+      },
+      error: (xhr,status,error) => {
+        $(this).prop('disabled', false);
+        $("#alert-msg").html('<div class="alert alert-danger" role="alert">Oops something went wrong. Please try again.</div>');
+
+        $(".alert").delay(2000).slideUp(200, function() {
+          $(this).alert('close');
+        });
+      }
+    });
+  });
+
+});
+</script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fruits | Fruitsninja{% endblock %}
+
+{% block body %}
+<div class="heading text-center mt-5 mb-5">
+  <h1>My Favourite Fruits</h1>
+</div>
+<div class="mb-2"> 
+  <a href="{{ path('app_fruits') }}" class="btn btn-warning">Back</a>
+</div>
+<div id="alert-msg"></div>
+<table class="table" id="myTable">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Family</th>
+      <th scope="col">Order</th>
+      <th scope="col">Genus</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set totalCalories = 0 %}
+    {% set totalFat = 0 %}
+    {% set totalSugar = 0 %}
+    {% set totalCarbohydrates = 0 %}
+    {% set totalProtein = 0 %}
+    {% if fruits %}
+      {% for fruit in fruits %}
+        {% set totalCalories = totalCalories + fruit.nutritions.calories %}
+        {% set totalFat = totalFat + fruit.nutritions.fat %}
+        {% set totalSugar = totalSugar + fruit.nutritions.sugar %}
+        {% set totalCarbohydrates = totalCarbohydrates + fruit.nutritions.carbohydrates %}
+        {% set totalProtein = totalProtein + fruit.nutritions.protein %}
+      <tr>
+        <td>{{ fruit.name }}</td>
+        <td>{{ fruit.family }}</td>
+        <td>{{ fruit.fruitOrder }}</td>
+        <td>{{ fruit.genus }}</td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      <tr>
+        <td colspan="5" class="text-center">No favourite fruits found.</td>
+      </tr>
+    {% endif %}
+  </tbody>
+</table>
+
+<h3 class="mt-5">Total Nutritions</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Calories</th>
+      <th>Fat</th>
+      <th>Sugar</th>
+      <th>Carbohydrates</th>
+      <th>Protein</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ totalCalories }}</td>
+      <td>{{ totalFat }}</td>
+      <td>{{ totalSugar }}</td>
+      <td>{{ totalCarbohydrates }}</td>
+      <td>{{ totalProtein }}</td>
+    </tr>
+  </tbody>
+</table>
+
+{% endblock %}
